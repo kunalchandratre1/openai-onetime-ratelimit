@@ -1,0 +1,133 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "_comment": "DEV parameters: small footprint for validation (10 products x 5 subscriptions = 50 keys). Matches the smaller scenario in the brief (sections 5 & 11). Use this to validate the pipeline end-to-end cheaply, then switch to prod.parameters.json for full scale. CONFIRM model versions before deploying.",
+  "parameters": {
+    "location": { "value": "swedencentral" },
+    "namePrefix": { "value": "apimfoundry" },
+    "environment": { "value": "dev" },
+    "apimName": { "value": "apim-foundry-dev-0ct5i" },
+    "apimSkuName": { "value": "Basicv2" },
+    "apimCapacity": { "value": 1 },
+    "apimPublisherEmail": { "value": "platform-team@example.com" },
+    "apimPublisherName": { "value": "Hackathon Platform Team (Dev)" },
+    "appInsightsName": { "value": "appi-apim-foundry-dev" },
+    "logAnalyticsName": { "value": "log-apim-foundry-dev" },
+
+    "foundryAccounts": {
+      "value": {
+        "swc": { "name": "oai-foundry-dev-swc-0ct5i", "location": "swedencentral" },
+        "eus2": { "name": "oai-foundry-dev-eus2-0ct5i", "location": "eastus2" },
+        "wus3": { "name": "oai-foundry-dev-wus3-0ct5i", "location": "westus3" }
+      }
+    },
+
+    "modelTopology": {
+      "value": [
+        {
+          "key": "gpt5-nano",
+          "apiName": "foundry-gpt5-nano-api",
+          "apiDisplayName": "Foundry GPT-5 Nano",
+          "apiPath": "gpt5-nano",
+          "poolName": "pool-foundry-gpt5-nano",
+          "deploymentName": "gpt-5-nano",
+          "modelName": "gpt-5-nano",
+          "modelVersion": "2025-08-07",
+          "deploymentType": "GlobalStandard",
+          "isEmbeddings": false,
+          "regions": [
+            { "account": "swc", "priority": 1 },
+            { "account": "eus2", "priority": 1 },
+            { "account": "wus3", "priority": 2 }
+          ]
+        },
+        {
+          "key": "gpt5-mini",
+          "apiName": "foundry-gpt5-mini-api",
+          "apiDisplayName": "Foundry GPT-5 Mini",
+          "apiPath": "gpt5-mini",
+          "poolName": "pool-foundry-gpt5-mini",
+          "deploymentName": "gpt-5-mini",
+          "modelName": "gpt-5-mini",
+          "modelVersion": "2025-08-07",
+          "deploymentType": "GlobalStandard",
+          "isEmbeddings": false,
+          "regions": [
+            { "account": "swc", "priority": 1 },
+            { "account": "eus2", "priority": 1 },
+            { "account": "wus3", "priority": 2 }
+          ]
+        },
+        {
+          "key": "gpt52",
+          "apiName": "foundry-gpt52-api",
+          "apiDisplayName": "Foundry GPT-5.2",
+          "apiPath": "gpt52",
+          "poolName": "pool-foundry-gpt52",
+          "deploymentName": "gpt-5.2",
+          "modelName": "gpt-5.2",
+          "modelVersion": "2025-12-11",
+          "deploymentType": "GlobalStandard",
+          "isEmbeddings": false,
+          "regions": [
+            { "account": "swc", "priority": 1 },
+            { "account": "eus2", "priority": 2 }
+          ]
+        },
+        {
+          "key": "gpt54",
+          "apiName": "foundry-gpt54-api",
+          "apiDisplayName": "Foundry GPT-5.4",
+          "apiPath": "gpt54",
+          "poolName": "pool-foundry-gpt54",
+          "deploymentName": "gpt-5.4",
+          "modelName": "gpt-5.4",
+          "modelVersion": "2026-03-05",
+          "deploymentType": "GlobalStandard",
+          "isEmbeddings": false,
+          "regions": [
+            { "account": "swc", "priority": 1 },
+            { "account": "eus2", "priority": 2 }
+          ]
+        },
+        {
+          "key": "embeddings",
+          "apiName": "foundry-embeddings-api",
+          "apiDisplayName": "Foundry Text Embedding 3 Large",
+          "apiPath": "embeddings",
+          "poolName": "pool-foundry-embeddings",
+          "deploymentName": "text-embedding-3-large",
+          "modelName": "text-embedding-3-large",
+          "modelVersion": "1",
+          "deploymentType": "Standard",
+          "isEmbeddings": true,
+          "regions": [
+            { "account": "swc", "priority": 1 }
+          ]
+        }
+      ]
+    },
+
+    "capacities": {
+      "value": {
+        "swc_gpt5-nano": 5,
+        "eus2_gpt5-nano": 5,
+        "wus3_gpt5-nano": 5,
+        "swc_gpt5-mini": 5,
+        "eus2_gpt5-mini": 5,
+        "wus3_gpt5-mini": 5,
+        "swc_gpt52": 5,
+        "eus2_gpt52": 5,
+        "swc_gpt54": 5,
+        "eus2_gpt54": 5,
+        "swc_embeddings": 5
+      }
+    },
+
+    "productCount": { "value": 10 },
+    "subscriptionsPerProduct": { "value": 5 },
+    "subscriptionTokenQuota": { "value": 2050000 },
+    "subscriptionTokenQuotaPeriod": { "value": "Yearly" },
+    "subscriptionTpmGuardrail": { "value": 25000 }
+  }
+}

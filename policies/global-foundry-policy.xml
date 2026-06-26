@@ -1,0 +1,53 @@
+<!--
+  global-foundry-policy.xml  -  APIM SERVICE (global) scope policy.
+
+  Purpose:
+    Enforce per-subscription-key token controls for Foundry APIs ONLY:
+      * Lifetime-style token quota: {{TOKEN_QUOTA}} tokens, resetting {{TOKEN_QUOTA_PERIOD}}.
+      * Burst guardrail: {{TPM_GUARDRAIL}} tokens-per-minute.
+      * Telemetry response headers (x-tokens-consumed, x-tokens-remaining*).
+    Scoped at runtime to APIs whose name starts with "foundry-" so non-Foundry
+    APIs are unaffected.
+
+  Key references (Microsoft Learn):
+    * llm-token-limit: https://learn.microsoft.com/azure/api-management/llm-token-limit-policy
+    * policy expressions / context.Subscription.Id / context.Api.Name:
+      https://learn.microsoft.com/azure/api-management/api-management-policy-expressions
+
+  IMPORTANT LIMITATIONS (see /docs/known-limitations.md):
+    * APIM has NO "lifetime" token-quota-period. Yearly is the closest supported
+      window; the 2.05M cap therefore resets yearly per key, not truly once-forever.
+    * token-quota enforcement returns HTTP 403 when exceeded.
+    * tokens-per-minute (burst) returns HTTP 429 when exceeded.
+    * Token accounting uses ACTUAL usage from the response (estimate-prompt-tokens=false)
+      for non-streaming calls. For streaming (stream:true) prompt & completion tokens
+      are ESTIMATED by the platform; exact per-token charging cannot be guaranteed in
+      policy alone. The per-API policy forces usage metadata where supported.
+-->
+<policies>
+  <inbound>
+    <choose>
+      <!-- Apply Foundry traceability only to foundry-* APIs. -->
+      <when condition="@(context.Api.Name != null && context.Api.Name.StartsWith("foundry-"))">
+        <!--
+          NOTE: token governance (llm-token-limit) lives in the API-scoped policies,
+          NOT here. The header-emitting attributes of llm-token-limit are unavailable
+          for global/product policies, so enforcement is applied at API scope where the
+          counter-key (= subscription id) still yields ONE shared budget per key across
+          all foundry APIs. See /docs/known-limitations.md.
+        -->
+        <!-- Echo the governing key (id only, never the secret) for traceability. -->
+        <set-header name="x-foundry-subscription-id" exists-action="override">
+          <value>@(context.Subscription.Id)</value>
+        </set-header>
+      </when>
+      <otherwise />
+    </choose>
+  </inbound>
+  <backend>
+  </backend>
+  <outbound>
+  </outbound>
+  <on-error>
+  </on-error>
+</policies>

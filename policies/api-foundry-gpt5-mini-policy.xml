@@ -1,0 +1,50 @@
+<!--
+  api-foundry-gpt5-mini-policy.xml  -  API scope (foundry-gpt5-mini-api).
+  Identical pattern to gpt5-nano; routes to pool-foundry-gpt5-mini.
+  See api-foundry-gpt5-nano-policy.xml header for reference links.
+-->
+<policies>
+  <inbound>
+    <base />
+    <!-- (1) Per-key token governance: shared lifetime/burst budget via counter-key.
+         Header attributes are valid here (API scope) but not at global/product scope. -->
+    <llm-token-limit
+      counter-key="@(context.Subscription.Id)"
+      tokens-per-minute="{{TPM_GUARDRAIL}}"
+      token-quota="{{TOKEN_QUOTA}}"
+      token-quota-period="{{TOKEN_QUOTA_PERIOD}}"
+      estimate-prompt-tokens="false"
+      tokens-consumed-header-name="x-tokens-consumed"
+      remaining-tokens-header-name="x-tokens-remaining-minute"
+      remaining-quota-tokens-header-name="x-tokens-remaining-quota"
+      retry-after-header-name="x-retry-after" />
+    <set-variable name="reqBody" value="@(context.Request.Body.As<JObject>(preserveContent: true))" />
+    <choose>
+      <when condition="@(((JObject)context.Variables["reqBody"])["stream"] != null && (bool)((JObject)context.Variables["reqBody"])["stream"])">
+        <set-body>@{
+          var body = (JObject)context.Variables["reqBody"];
+          var so = body["stream_options"] as JObject ?? new JObject();
+          so["include_usage"] = true;
+          body["stream_options"] = so;
+          return body.ToString();
+        }</set-body>
+      </when>
+      <otherwise />
+    </choose>
+    <set-backend-service backend-id="pool-foundry-gpt5-mini" />
+    <authentication-managed-identity resource="https://cognitiveservices.azure.com" output-token-variable-name="msi-access-token" ignore-error="false" />
+    <set-header name="Authorization" exists-action="override">
+      <value>@("Bearer " + (string)context.Variables["msi-access-token"])</value>
+    </set-header>
+    <set-header name="api-key" exists-action="delete" />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

@@ -1,0 +1,83 @@
+### =============================================================================
+### smoke-tests.http  -  Manual smoke tests (VS Code "REST Client" extension).
+### Replace the @variables below, then click "Send Request" above each call.
+###
+### How to get values:
+###   @gateway : az apim show -g <rg> -n <apim> --query gatewayUrl -o tsv
+###   @apiKey  : az rest --method post \
+###              --url "https://management.azure.com/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.ApiManagement/service/<apim>/subscriptions/p1subscriptionteam1/listSecrets?api-version=2024-05-01" \
+###              --query primaryKey -o tsv
+### =============================================================================
+
+@gateway = https://<apim-name>.azure-api.net
+@apiKey = <subscription-primary-key>
+@apiVersion = 2024-10-21
+
+### GPT-5 Nano - chat completion
+POST {{gateway}}/gpt5-nano/deployments/gpt-5-nano/chat/completions?api-version={{apiVersion}}
+api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "messages": [{ "role": "user", "content": "Reply with the single word: pong." }],
+  "max_tokens": 16
+}
+
+### GPT-5 Mini - chat completion
+POST {{gateway}}/gpt5-mini/deployments/gpt-5-mini/chat/completions?api-version={{apiVersion}}
+api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "messages": [{ "role": "user", "content": "Say hi." }],
+  "max_tokens": 16
+}
+
+### GPT-5.2 - chat completion
+POST {{gateway}}/gpt52/deployments/gpt-5.2/chat/completions?api-version={{apiVersion}}
+api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "messages": [{ "role": "user", "content": "Say hi." }],
+  "max_tokens": 16
+}
+
+### GPT-5.4 - chat completion
+POST {{gateway}}/gpt54/deployments/gpt-5.4/chat/completions?api-version={{apiVersion}}
+api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "messages": [{ "role": "user", "content": "Say hi." }],
+  "max_tokens": 16
+}
+
+### Embeddings - text-embedding-3-large
+POST {{gateway}}/embeddings/deployments/text-embedding-3-large/embeddings?api-version={{apiVersion}}
+api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "input": "hello world"
+}
+
+### Streaming chat (validates forced stream_options.include_usage for token accounting)
+POST {{gateway}}/gpt5-nano/deployments/gpt-5-nano/chat/completions?api-version={{apiVersion}}
+api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "messages": [{ "role": "user", "content": "Count to three." }],
+  "max_tokens": 32,
+  "stream": true
+}
+
+### Negative test - missing api-key should return 401
+POST {{gateway}}/gpt5-nano/deployments/gpt-5-nano/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+
+{
+  "messages": [{ "role": "user", "content": "should fail" }],
+  "max_tokens": 8
+}
