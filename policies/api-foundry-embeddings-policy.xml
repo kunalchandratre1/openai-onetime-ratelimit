@@ -20,6 +20,11 @@
       remaining-quota-tokens-header-name="x-tokens-remaining-quota"
       retry-after-header-name="x-retry-after" />
     <set-backend-service backend-id="pool-foundry-embeddings" />
+    <azure-openai-emit-token-metric namespace="openai">
+      <dimension name="Subscription ID" value="@(context.Subscription.Id)" />
+      <dimension name="API ID" value="@(context.Api.Id)" />
+      <dimension name="Client IP" value="@(context.Request.IpAddress)" />
+    </azure-openai-emit-token-metric>
   </inbound>
   <backend>
     <retry count="2" interval="0" first-fast-retry="true" condition="@(context.Response.StatusCode == 429 || context.Response.StatusCode == 503)">
