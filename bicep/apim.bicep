@@ -78,8 +78,9 @@ resource diagnostic 'Microsoft.ApiManagement/service/diagnostics@2024-05-01' = {
     alwaysLog: 'allErrors'
     sampling: {
       samplingType: 'fixed'
-      percentage: 0
+      percentage: 100
     }
+    metrics: true
     verbosity: 'error'
     httpCorrelationProtocol: 'W3C'
   }
