@@ -17,6 +17,7 @@ module apiModules 'modules/apim-api.bicep' = [for a in apis: {
     displayName: a.displayName
     path: a.path
     isEmbeddings: a.isEmbeddings
+    serviceUrl: a.serviceUrl
     policyXml: a.policyXml
   }
 }]

@@ -26,6 +26,9 @@ param path string
 @description('True => embeddings operation; otherwise chat completions.')
 param isEmbeddings bool
 
+@description('Backend base URL for direct routing, e.g. https://acct.openai.azure.com/openai')
+param serviceUrl string
+
 @description('API-scoped policy XML (routing + managed-identity auth).')
 param policyXml string
 
@@ -48,48 +51,13 @@ resource api 'Microsoft.ApiManagement/service/apis@2024-05-01' = {
       header: 'api-key'
       query: 'subscription-key'
     }
-    // serviceUrl intentionally omitted: the API policy selects the backend pool,
-    // and the pool member base-url provides the effective backend host.
+    // Import the Azure OpenAI inference spec so APIM recognizes this as an LLM API.
+    // This enables llm-token-limit token parsing/usage accounting AND ensures the
+    // response body is buffered/returned (generic HTTP APIs drop the body).
     apiType: 'http'
-  }
-}
-
-// ---- Operation --------------------------------------------------------------
-var opName = isEmbeddings ? 'embeddings' : 'chat-completions'
-var opDisplay = isEmbeddings ? 'Create embeddings' : 'Create chat completion'
-var opUrlTemplate = isEmbeddings ? '/deployments/{deployment-id}/embeddings' : '/deployments/{deployment-id}/chat/completions'
-
-resource operation 'Microsoft.ApiManagement/service/apis/operations@2024-05-01' = {
-  parent: api
-  name: opName
-  properties: {
-    displayName: opDisplay
-    method: 'POST'
-    urlTemplate: opUrlTemplate
-    templateParameters: [
-      {
-        name: 'deployment-id'
-        description: 'Foundry deployment name (model family deployment id).'
-        type: 'string'
-        required: true
-      }
-    ]
-    request: {
-      queryParameters: [
-        {
-          name: 'api-version'
-          description: 'Azure OpenAI data-plane API version, e.g. 2024-10-21.'
-          type: 'string'
-          required: true
-        }
-      ]
-    }
-    responses: [
-      {
-        statusCode: 200
-        description: 'OK'
-      }
-    ]
+    format: 'openapi-link'
+    value: 'https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/specification/cognitiveservices/data-plane/AzureOpenAI/inference/stable/2024-10-21/inference.json'
+    serviceUrl: serviceUrl
   }
 }
 
@@ -102,9 +70,6 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01' = 
     format: 'rawxml'
     value: policyXml
   }
-  dependsOn: [
-    operation
-  ]
 }
 
 output apiName string = api.name

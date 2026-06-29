@@ -44,6 +44,16 @@ resource backendEntities 'Microsoft.ApiManagement/service/backends@2024-06-01-pr
   properties: {
     protocol: 'http'
     url: b.url
+    // APIM mints an Entra token for Azure OpenAI using its managed identity and
+    // presents it to the backend. Authenticating at the backend (not via an inbound
+    // authentication-managed-identity policy) keeps the GenAI request/response
+    // pipeline intact so token counting and response bodies work correctly.
+    credentials: {
+      #disable-next-line BCP037
+      managedIdentity: {
+        resource: 'https://cognitiveservices.azure.com'
+      }
+    }
     circuitBreaker: {
       rules: [
         {

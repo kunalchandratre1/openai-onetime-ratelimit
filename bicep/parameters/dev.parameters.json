@@ -6,7 +6,7 @@
     "location": { "value": "swedencentral" },
     "namePrefix": { "value": "apimfoundry" },
     "environment": { "value": "dev" },
-    "apimName": { "value": "apim-foundry-dev-0ct5i" },
+    "apimName": { "value": "apim-foundry-dev-jhs92" },
     "apimSkuName": { "value": "Basicv2" },
     "apimCapacity": { "value": 1 },
     "apimPublisherEmail": { "value": "platform-team@example.com" },
@@ -16,9 +16,9 @@
 
     "foundryAccounts": {
       "value": {
-        "swc": { "name": "oai-foundry-dev-swc-0ct5i", "location": "swedencentral" },
-        "eus2": { "name": "oai-foundry-dev-eus2-0ct5i", "location": "eastus2" },
-        "wus3": { "name": "oai-foundry-dev-wus3-0ct5i", "location": "westus3" }
+        "swc": { "name": "oai-foundry-dev-swc-jhs92", "location": "swedencentral" },
+        "eus2": { "name": "oai-foundry-dev-eus2-jhs92", "location": "eastus2" },
+        "wus3": { "name": "oai-foundry-dev-wus3-jhs92", "location": "westus3" }
       }
     },
 
@@ -126,7 +126,7 @@
 
     "productCount": { "value": 10 },
     "subscriptionsPerProduct": { "value": 5 },
-    "subscriptionTokenQuota": { "value": 2050000 },
+    "subscriptionTokenQuota": { "value": 1000 },
     "subscriptionTokenQuotaPeriod": { "value": "Yearly" },
     "subscriptionTpmGuardrail": { "value": 25000 }
   }

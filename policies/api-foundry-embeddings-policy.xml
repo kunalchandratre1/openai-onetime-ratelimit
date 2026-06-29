@@ -14,20 +14,18 @@
       tokens-per-minute="{{TPM_GUARDRAIL}}"
       token-quota="{{TOKEN_QUOTA}}"
       token-quota-period="{{TOKEN_QUOTA_PERIOD}}"
-      estimate-prompt-tokens="false"
+      estimate-prompt-tokens="true"
       tokens-consumed-header-name="x-tokens-consumed"
       remaining-tokens-header-name="x-tokens-remaining-minute"
       remaining-quota-tokens-header-name="x-tokens-remaining-quota"
       retry-after-header-name="x-retry-after" />
     <set-backend-service backend-id="pool-foundry-embeddings" />
-    <authentication-managed-identity resource="https://cognitiveservices.azure.com" output-token-variable-name="msi-access-token" ignore-error="false" />
-    <set-header name="Authorization" exists-action="override">
-      <value>@("Bearer " + (string)context.Variables["msi-access-token"])</value>
-    </set-header>
-    <set-header name="api-key" exists-action="delete" />
   </inbound>
   <backend>
-    <base />
+    <retry count="2" interval="0" first-fast-retry="true" condition="@(context.Response.StatusCode == 429 || context.Response.StatusCode == 503)">
+      <set-backend-service backend-id="pool-foundry-embeddings" />
+      <forward-request buffer-request-body="true" />
+    </retry>
   </backend>
   <outbound>
     <base />

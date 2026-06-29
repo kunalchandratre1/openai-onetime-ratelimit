@@ -24,37 +24,19 @@
       tokens-per-minute="{{TPM_GUARDRAIL}}"
       token-quota="{{TOKEN_QUOTA}}"
       token-quota-period="{{TOKEN_QUOTA_PERIOD}}"
-      estimate-prompt-tokens="false"
+      estimate-prompt-tokens="true"
       tokens-consumed-header-name="x-tokens-consumed"
       remaining-tokens-header-name="x-tokens-remaining-minute"
       remaining-quota-tokens-header-name="x-tokens-remaining-quota"
       retry-after-header-name="x-retry-after" />
-    <!-- (2) Force usage metadata for streaming requests so tokens can be accounted. -->
-    <set-variable name="reqBody" value="@(context.Request.Body.As<JObject>(preserveContent: true))" />
-    <choose>
-      <when condition="@(((JObject)context.Variables["reqBody"])["stream"] != null && (bool)((JObject)context.Variables["reqBody"])["stream"])">
-        <set-body>@{
-          var body = (JObject)context.Variables["reqBody"];
-          var so = body["stream_options"] as JObject ?? new JObject();
-          so["include_usage"] = true;
-          body["stream_options"] = so;
-          return body.ToString();
-        }</set-body>
-      </when>
-      <otherwise />
-    </choose>
     <!-- (3) Route to the regional backend pool for this model family. -->
     <set-backend-service backend-id="pool-foundry-gpt5-nano" />
-    <!-- (4) Mint an Entra token for Azure OpenAI and present it as a bearer token. -->
-    <authentication-managed-identity resource="https://cognitiveservices.azure.com" output-token-variable-name="msi-access-token" ignore-error="false" />
-    <set-header name="Authorization" exists-action="override">
-      <value>@("Bearer " + (string)context.Variables["msi-access-token"])</value>
-    </set-header>
-    <!-- Strip the inbound api-key header so it never reaches the backend. -->
-    <set-header name="api-key" exists-action="delete" />
   </inbound>
   <backend>
-    <base />
+    <retry count="2" interval="0" first-fast-retry="true" condition="@(context.Response.StatusCode == 429 || context.Response.StatusCode == 503)">
+      <set-backend-service backend-id="pool-foundry-gpt5-nano" />
+      <forward-request buffer-request-body="true" />
+    </retry>
   </backend>
   <outbound>
     <base />
