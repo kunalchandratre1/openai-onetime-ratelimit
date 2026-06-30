@@ -131,3 +131,60 @@ cd scripts
 7. `05-apply-apim-artifacts.ps1` *(only when changing policies separately)*
 8. `06-create-products-and-subscriptions.ps1` *(only when rescaling separately)*
 9. Tests (see testing guide)
+
+---
+
+## End-to-end fresh-environment runbook (copy-paste)
+
+This is the exact sequence to bring up a brand-new environment from zero,
+including verification of the per-subscription token quota and App Insights
+custom metrics. Replace `<your-sub-guid>` and the names to match your params file.
+
+```powershell
+cd scripts
+
+# --- Provision ---
+./00-prereqs.ps1
+./01-login-and-select-subscription.ps1 -SubscriptionId <your-sub-guid>
+./02-register-providers.ps1
+./03-validate-quota.ps1 -ParametersFile ../bicep/parameters/dev.parameters.json
+
+# Preview, then deploy the full stack (APIM + Foundry + APIs + products + subs + policy)
+./04-deploy-infra.ps1 -ResourceGroup rg-apim-foundry-dev -Location swedencentral `
+  -ParametersFile ../bicep/parameters/dev.parameters.json -WhatIfOnly
+./04-deploy-infra.ps1 -ResourceGroup rg-apim-foundry-dev -Location swedencentral `
+  -ParametersFile ../bicep/parameters/dev.parameters.json
+
+# Smoke test
+./07-post-deploy-smoke-tests.ps1 -ResourceGroup rg-apim-foundry-dev `
+  -ApimName <apim-name> -ParametersFile ../bicep/parameters/dev.parameters.json
+```
+
+> The token-metric fix is now in `bicep/apim.bicep` (`metrics: true`, sampling
+> `100`), so step 04 enables App Insights custom metrics automatically — no manual
+> CLI step required on a fresh deploy.
+
+### Verify: subscription token quota enforcement
+
+A subscriber should drain its yearly token cap (1,000 in dev) then receive 403.
+
+```powershell
+$rg='rg-hackathon-dev'; $apim='<apim-name>'; $sub='<your-sub-guid>'
+$g="https://$apim.azure-api.net/gpt5-mini/deployments/gpt-5-mini/chat/completions?api-version=2024-12-01-preview"
+$b=@{messages=@(@{role='user';content='write a long paragraph about oceans'});max_completion_tokens=400}|ConvertTo-Json
+$k=(az rest --method post --url "https://management.azure.com/subscriptions/$sub/resourceGroups/$rg/providers/Microsoft.ApiManagement/service/$apim/subscriptions/p6subscriptionteam1/listSecrets?api-version=2024-05-01" -o json|ConvertFrom-Json).primaryKey
+$code=200; while($code -eq 200){ $r=Invoke-WebRequest -Method Post -Uri $g -Headers @{'api-key'=$k;'Content-Type'='application/json'} -Body $b -SkipHttpErrorCheck; $code=$r.StatusCode }
+"final status=$code"   # expect 403 once the cap is exceeded
+```
+
+### Verify: per-subscription token metrics in App Insights
+
+Allow 2–5 min for ingestion, then query custom metrics by subscription:
+
+```powershell
+$name='appi-apim-foundry-dev'
+az monitor app-insights query --app $name -g rg-hackathon-dev --analytics-query `
+  "customMetrics | where name=='Total Tokens' | extend sub=tostring(customDimensions['Subscription ID']) | summarize tokens=sum(value) by sub | order by tokens desc" -o table
+```
+
+Each drained subscriber should show ~1,000+ tokens; untouched subscribers stay near zero.

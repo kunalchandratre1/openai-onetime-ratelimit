@@ -18,7 +18,8 @@ param(
     [int]    $Samples = 5,
     [switch] $DriveToLimit,
     [int]    $MaxDriveIterations = 2000,
-    [string] $DataPlaneApiVersion = '2024-10-21',
+    [int]    $MaxCompletionTokens = 256,
+    [string] $DataPlaneApiVersion = '2024-12-01-preview',
     [string] $MgmtApiVersion = '2024-05-01'
 )
 . "$PSScriptRoot/../scripts/lib/common.ps1"
@@ -32,7 +33,8 @@ $apiKey = (az rest --method post --url $secretsUrl -o json | ConvertFrom-Json).p
 if (-not $apiKey) { throw "No key for $SubscriptionName" }
 
 $url = "$gateway/$ApiPath/deployments/$DeploymentName/chat/completions?api-version=$DataPlaneApiVersion"
-$body = @{ messages = @(@{ role = 'user'; content = 'one word please' }); max_tokens = 16 } | ConvertTo-Json -Depth 5
+# gpt-5 family requires max_completion_tokens (max_tokens is rejected with HTTP 400).
+$body = @{ messages = @(@{ role = 'user'; content = 'write a detailed paragraph about oceans and mountains' }); max_completion_tokens = $MaxCompletionTokens } | ConvertTo-Json -Depth 5
 
 function Send-One {
     Invoke-WebRequest -Method Post -Uri $url -Headers @{ 'api-key' = $apiKey; 'Content-Type' = 'application/json' } -Body $body -SkipHttpErrorCheck
