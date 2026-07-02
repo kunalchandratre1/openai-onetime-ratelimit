@@ -101,6 +101,7 @@
           "modelVersion": "2026-02-24",
           "deploymentType": "GlobalStandard",
           "isEmbeddings": false,
+          "isResponses": true,
           "regions": [
             { "account": "swc", "priority": 1 },
             { "account": "eus2", "priority": 2 }

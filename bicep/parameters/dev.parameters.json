@@ -6,7 +6,7 @@
     "location": { "value": "swedencentral" },
     "namePrefix": { "value": "apimfoundry" },
     "environment": { "value": "dev" },
-    "apimName": { "value": "apim-foundry-dev-jhs92" },
+    "apimName": { "value": "apim-foundry-dev-z1hvd" },
     "apimSkuName": { "value": "Basicv2" },
     "apimCapacity": { "value": 1 },
     "apimPublisherEmail": { "value": "platform-team@example.com" },
@@ -16,9 +16,9 @@
 
     "foundryAccounts": {
       "value": {
-        "swc": { "name": "oai-foundry-dev-swc-jhs92", "location": "swedencentral" },
-        "eus2": { "name": "oai-foundry-dev-eus2-jhs92", "location": "eastus2" },
-        "wus3": { "name": "oai-foundry-dev-wus3-jhs92", "location": "westus3" }
+        "swc": { "name": "oai-foundry-dev-swc-z1hvd", "location": "swedencentral" },
+        "eus2": { "name": "oai-foundry-dev-eus2-z1hvd", "location": "eastus2" },
+        "wus3": { "name": "oai-foundry-dev-wus3-z1hvd", "location": "westus3" }
       }
     },
 
@@ -101,6 +101,7 @@
           "modelVersion": "2026-02-24",
           "deploymentType": "GlobalStandard",
           "isEmbeddings": false,
+          "isResponses": true,
           "regions": [
             { "account": "swc", "priority": 1 },
             { "account": "eus2", "priority": 2 }

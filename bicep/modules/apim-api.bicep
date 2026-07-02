@@ -26,6 +26,9 @@ param path string
 @description('True => embeddings operation; otherwise chat completions.')
 param isEmbeddings bool
 
+@description('True => model uses the Azure OpenAI Responses API (e.g. Codex). Adds a POST /responses operation not present in the imported chat-completions spec.')
+param isResponses bool = false
+
 @description('Backend base URL for direct routing, e.g. https://acct.openai.azure.com/openai')
 param serviceUrl string
 
@@ -69,6 +72,38 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01' = 
   properties: {
     format: 'rawxml'
     value: policyXml
+  }
+}
+
+// ---- Responses API operation (Codex etc.) -----------------------------------
+// The imported chat-completions inference spec does not define the Responses API
+// endpoint. Models whose only supported surface is /responses (e.g. gpt-5.3-codex,
+// chatCompletion=false) require this operation to be added explicitly so calls to
+// POST {path}/responses route to the backend pool.
+resource responsesOp 'Microsoft.ApiManagement/service/apis/operations@2024-05-01' = if (isResponses) {
+  parent: api
+  name: 'create-response'
+  properties: {
+    displayName: 'Create Response'
+    method: 'POST'
+    urlTemplate: '/responses'
+    templateParameters: []
+    request: {
+      queryParameters: [
+        {
+          name: 'api-version'
+          description: 'Azure OpenAI data-plane API version.'
+          type: 'string'
+          required: true
+        }
+      ]
+    }
+    responses: [
+      {
+        statusCode: 200
+        description: 'OK'
+      }
+    ]
   }
 }
 

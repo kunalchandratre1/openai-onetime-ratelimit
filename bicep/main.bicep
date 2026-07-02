@@ -207,6 +207,7 @@ var apiList = [for f in modelTopology: {
   path: f.apiPath
   poolName: f.poolName
   isEmbeddings: f.isEmbeddings
+  isResponses: f.?isResponses ?? false
   serviceUrl: 'https://${toLower(foundryAccounts[f.regions[0].account].name)}.openai.azure.com/openai'
   policyXml: replace(replace(replace(apiPolicyMap[f.apiName], '{{TOKEN_QUOTA}}', string(subscriptionTokenQuota)), '{{TOKEN_QUOTA_PERIOD}}', subscriptionTokenQuotaPeriod), '{{TPM_GUARDRAIL}}', string(subscriptionTpmGuardrail))
 }]
