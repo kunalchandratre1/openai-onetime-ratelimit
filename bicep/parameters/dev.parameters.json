@@ -91,6 +91,22 @@
           ]
         },
         {
+          "key": "codex",
+          "apiName": "foundry-codex-api",
+          "apiDisplayName": "Foundry GPT Codex",
+          "apiPath": "codex",
+          "poolName": "pool-foundry-codex",
+          "deploymentName": "gpt-5.3-codex",
+          "modelName": "gpt-5.3-codex",
+          "modelVersion": "2026-02-24",
+          "deploymentType": "GlobalStandard",
+          "isEmbeddings": false,
+          "regions": [
+            { "account": "swc", "priority": 1 },
+            { "account": "eus2", "priority": 2 }
+          ]
+        },
+        {
           "key": "embeddings",
           "apiName": "foundry-embeddings-api",
           "apiDisplayName": "Foundry Text Embedding 3 Large",
@@ -120,6 +136,8 @@
         "eus2_gpt52": 5,
         "swc_gpt54": 5,
         "eus2_gpt54": 5,
+        "swc_codex": 5,
+        "eus2_codex": 5,
         "swc_embeddings": 5
       }
     },

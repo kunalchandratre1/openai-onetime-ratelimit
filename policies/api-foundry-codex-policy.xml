@@ -1,0 +1,38 @@
+<!--
+  api-foundry-codex-policy.xml  -  API scope (foundry-codex-api).
+  Identical pattern to gpt5-mini; routes to pool-foundry-codex.
+  See api-foundry-gpt5-nano-policy.xml header for reference links.
+-->
+<policies>
+  <inbound>
+    <base />
+    <llm-token-limit
+      counter-key="@(context.Subscription.Id)"
+      tokens-per-minute="{{TPM_GUARDRAIL}}"
+      token-quota="{{TOKEN_QUOTA}}"
+      token-quota-period="{{TOKEN_QUOTA_PERIOD}}"
+      estimate-prompt-tokens="true"
+      tokens-consumed-header-name="x-tokens-consumed"
+      remaining-tokens-header-name="x-tokens-remaining-minute"
+      remaining-quota-tokens-header-name="x-tokens-remaining-quota"
+      retry-after-header-name="x-retry-after" />
+    <set-backend-service backend-id="pool-foundry-codex" />
+    <azure-openai-emit-token-metric namespace="openai">
+      <dimension name="Subscription ID" value="@(context.Subscription.Id)" />
+      <dimension name="API ID" value="@(context.Api.Id)" />
+      <dimension name="Client IP" value="@(context.Request.IpAddress)" />
+    </azure-openai-emit-token-metric>
+  </inbound>
+  <backend>
+    <retry count="2" interval="0" first-fast-retry="true" condition="@(context.Response.StatusCode == 429 || context.Response.StatusCode == 503)">
+      <set-backend-service backend-id="pool-foundry-codex" />
+      <forward-request buffer-request-body="true" />
+    </retry>
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

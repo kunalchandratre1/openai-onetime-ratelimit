@@ -193,6 +193,7 @@ var apiPolicyMap = {
   'foundry-gpt5-mini-api': loadTextContent('../policies/api-foundry-gpt5-mini-policy.xml')
   'foundry-gpt52-api': loadTextContent('../policies/api-foundry-gpt52-policy.xml')
   'foundry-gpt54-api': loadTextContent('../policies/api-foundry-gpt54-policy.xml')
+  'foundry-codex-api': loadTextContent('../policies/api-foundry-codex-policy.xml')
   'foundry-embeddings-api': loadTextContent('../policies/api-foundry-embeddings-policy.xml')
 }
 
