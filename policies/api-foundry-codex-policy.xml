@@ -16,6 +16,15 @@
       remaining-tokens-header-name="x-tokens-remaining-minute"
       remaining-quota-tokens-header-name="x-tokens-remaining-quota"
       retry-after-header-name="x-retry-after" />
+    <!--
+      OpenAI-compatible clients (e.g. Continue.dev) call POST {apiBase}/responses
+      WITHOUT an api-version query parameter. Azure OpenAI requires it, so inject a
+      default when the caller omits it (exists-action="skip" keeps a caller-supplied
+      value). This lets tools set apiBase=https://<apim>/codex and "just work".
+    -->
+    <set-query-parameter name="api-version" exists-action="skip">
+      <value>2025-04-01-preview</value>
+    </set-query-parameter>
     <set-backend-service backend-id="pool-foundry-codex" />
     <azure-openai-emit-token-metric namespace="openai">
       <dimension name="Subscription ID" value="@(context.Subscription.Id)" />
