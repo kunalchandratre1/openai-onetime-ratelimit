@@ -6,8 +6,8 @@
     "location": { "value": "swedencentral" },
     "namePrefix": { "value": "apimfoundry" },
     "environment": { "value": "prod" },
-    "apimName": { "value": "apim-foundry-prod-001" },
-    "apimSkuName": { "value": "Basicv2" },
+    "apimName": { "value": "apim-foundry-prod-b41sp" },
+    "apimSkuName": { "value": "Standardv2" },
     "apimCapacity": { "value": 2 },
     "apimPublisherEmail": { "value": "platform-team@example.com" },
     "apimPublisherName": { "value": "Hackathon Platform Team" },
@@ -16,9 +16,9 @@
 
     "foundryAccounts": {
       "value": {
-        "swc": { "name": "oai-foundry-prod-swc", "location": "swedencentral" },
-        "eus2": { "name": "oai-foundry-prod-eus2", "location": "eastus2" },
-        "wus3": { "name": "oai-foundry-prod-wus3", "location": "westus3" }
+        "swc": { "name": "oai-foundry-prod-swc-b41sp", "location": "swedencentral" },
+        "eus2": { "name": "oai-foundry-prod-eus2-b41sp", "location": "eastus2" },
+        "wus3": { "name": "oai-foundry-prod-wus3-b41sp", "location": "westus3" }
       }
     },
 
@@ -32,7 +32,7 @@
           "poolName": "pool-foundry-gpt5-nano",
           "deploymentName": "gpt-5-nano",
           "modelName": "gpt-5-nano",
-          "modelVersion": "REPLACE-WITH-CONFIRMED-VERSION",
+          "modelVersion": "2025-08-07",
           "deploymentType": "GlobalStandard",
           "isEmbeddings": false,
           "regions": [
@@ -49,7 +49,7 @@
           "poolName": "pool-foundry-gpt5-mini",
           "deploymentName": "gpt-5-mini",
           "modelName": "gpt-5-mini",
-          "modelVersion": "REPLACE-WITH-CONFIRMED-VERSION",
+          "modelVersion": "2025-08-07",
           "deploymentType": "GlobalStandard",
           "isEmbeddings": false,
           "regions": [
@@ -66,7 +66,7 @@
           "poolName": "pool-foundry-gpt52",
           "deploymentName": "gpt-5.2",
           "modelName": "gpt-5.2",
-          "modelVersion": "REPLACE-WITH-CONFIRMED-VERSION",
+          "modelVersion": "2025-12-11",
           "deploymentType": "GlobalStandard",
           "isEmbeddings": false,
           "regions": [
@@ -82,7 +82,7 @@
           "poolName": "pool-foundry-gpt54",
           "deploymentName": "gpt-5.4",
           "modelName": "gpt-5.4",
-          "modelVersion": "REPLACE-WITH-CONFIRMED-VERSION",
+          "modelVersion": "2026-03-05",
           "deploymentType": "GlobalStandard",
           "isEmbeddings": false,
           "regions": [
@@ -115,8 +115,8 @@
           "poolName": "pool-foundry-embeddings",
           "deploymentName": "text-embedding-3-large",
           "modelName": "text-embedding-3-large",
-          "modelVersion": "REPLACE-WITH-CONFIRMED-VERSION",
-          "deploymentType": "GlobalStandard",
+          "modelVersion": "1",
+          "deploymentType": "Standard",
           "isEmbeddings": true,
           "regions": [
             { "account": "swc", "priority": 1 }
@@ -143,8 +143,8 @@
       }
     },
 
-    "productCount": { "value": 10 },
-    "subscriptionsPerProduct": { "value": 5 },
+    "productCount": { "value": 110 },
+    "subscriptionsPerProduct": { "value": 10 },
     "subscriptionTokenQuota": { "value": 2050000 },
     "subscriptionTokenQuotaPeriod": { "value": "Yearly" },
     "subscriptionTpmGuardrail": { "value": 25000 }

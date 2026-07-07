@@ -292,29 +292,23 @@ module apis 'apim-apis.bicep' = {
   ]
 }
 
-module products 'apim-products.bicep' = {
-  name: 'apim-products'
+// Products + subscriptions are created ONE product per nested deployment to stay
+// under ARM's hard limits (800 resources per deployment, 800 iterations per copy
+// loop). The outer loop = productCount (<= 800); each nested deployment holds only
+// 1 product + apiNames links + subscriptionsPerProduct keys. This scales to the
+// prod design (110 x 10 = 1100 keys) while still working for dev (10 x 5 = 50).
+module productBatches 'modules/apim-product-batch.bicep' = [for i in range(1, productCount): {
+  name: 'product-p${i}'
   params: {
     apimName: apim.outputs.apimName
-    productCount: productCount
+    productIndex: i
     apiNames: allApiNames
+    subscriptionsPerProduct: subscriptionsPerProduct
   }
   dependsOn: [
     apis
   ]
-}
-
-module subscriptions 'apim-subscriptions.bicep' = {
-  name: 'apim-subscriptions'
-  params: {
-    apimName: apim.outputs.apimName
-    productCount: productCount
-    subscriptionsPerProduct: subscriptionsPerProduct
-  }
-  dependsOn: [
-    products
-  ]
-}
+}]
 
 // =============================================================================
 // Outputs

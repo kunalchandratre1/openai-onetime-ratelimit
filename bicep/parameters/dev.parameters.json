@@ -145,7 +145,7 @@
 
     "productCount": { "value": 10 },
     "subscriptionsPerProduct": { "value": 5 },
-    "subscriptionTokenQuota": { "value": 1000 },
+    "subscriptionTokenQuota": { "value": 100000 },
     "subscriptionTokenQuotaPeriod": { "value": "Yearly" },
     "subscriptionTpmGuardrail": { "value": 25000 }
   }
