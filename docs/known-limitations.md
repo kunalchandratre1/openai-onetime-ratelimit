@@ -107,3 +107,19 @@ exhausting quotas.
 
 `apimName` and `foundryAccounts[].name` must be globally unique. A deleted APIM may
 linger in **soft-deleted** state; purge before reusing the same name.
+
+## 10. ARM 800-resource / 800-copy limit at scale
+
+**Constraint:** an ARM deployment allows at most **800 resources** and **800
+copy-loop iterations** per template. A single flat loop creating
+`productCount × subscriptionsPerProduct` keys therefore breaks past ~800 keys
+(e.g. prod `110 × 10 = 1100` fails with *"template resources limit exceeded"* /
+*"invalid copy count"*).
+
+**Design used:** products/subscriptions are created via
+`modules/apim-product-batch.bicep` — **one nested deployment per product** (product
++ API links + its keys). The outer loop equals `productCount` and each nested
+deployment holds only ~`1 + apiNames + subscriptionsPerProduct` resources, so the
+design now supports **1000+ keys** while remaining valid for small dev counts.
+This scales to 800 products × 50 keys = 40,000 keys before the outer loop itself
+approaches the limit.

@@ -103,6 +103,16 @@ Change `productCount` / `subscriptionsPerProduct` in the params file, then:
   -ParametersFile ../bicep/parameters/dev.parameters.json
 ```
 
+> **Scale: the design now supports 1000+ keys.** ARM caps a single deployment at
+> 800 resources and 800 copy-loop iterations, so a flat loop breaks past ~800 keys.
+> `main.bicep` therefore creates products via `modules/apim-product-batch.bicep` —
+> **one nested deployment per product**, each provisioning that product, its API
+> links, and its `subscriptionsPerProduct` keys. The outer loop equals
+> `productCount` and every nested deployment stays small, so prod scale
+> (e.g. `110 × 10 = 1100` keys) deploys cleanly while small counts (dev `10 × 5`)
+> work unchanged. `06-create-products-and-subscriptions.ps1` uses direct REST
+> upserts (no ARM template) and is likewise unaffected by the 800 limit.
+
 ## 9. Validate
 
 See [testing-guide.md](testing-guide.md). Minimum:
