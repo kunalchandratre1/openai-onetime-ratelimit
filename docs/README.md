@@ -1,4 +1,4 @@
-# APIM + Azure AI Foundry Front Door
+# APIM + Azure AI Foundry
 
 A production-oriented, parameterised IaC repository that fronts multi-region Azure
 AI Foundry / Azure OpenAI model deployments with **Azure API Management (Basic v2)**,
