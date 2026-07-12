@@ -1,4 +1,4 @@
-# APIM + Azure AI Foundry
+# APIM + Azure AI Foundry and lifetime token policy
 
 A production-oriented, parameterised IaC repository that fronts multi-region Azure
 AI Foundry / Azure OpenAI model deployments with **Azure API Management (Basic v2)**,
